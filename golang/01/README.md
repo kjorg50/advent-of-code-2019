@@ -3,5 +3,5 @@
 **Usage**
 
 ```
-go run day01.go -- input.txt
+go run day01.go -- part[1|2] input.txt
 ```
