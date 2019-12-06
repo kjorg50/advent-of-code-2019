@@ -7,6 +7,13 @@ import (
   "os"
 )
 
+func check(e error) {
+  if e != nil {
+    log.Fatal(e)
+    panic(e)
+  }
+}
+
 func main() {
   if len(os.Args) != 4 {
     fmt.Println("Usage: go run dayXX.go -- part[1|2] <filename>")
@@ -16,9 +23,8 @@ func main() {
   filename := os.Args[3]
 
   file, err := os.Open(filename)
-  if err != nil {
-    log.Fatal(err)
-  }
+  check(err)
+
   defer file.Close()
   scanner := bufio.NewScanner(file)
 
@@ -39,10 +45,8 @@ func part1(scanner *bufio.Scanner) {
 
   }
 
-  if err := scanner.Err(); err != nil {
-    log.Fatal(err)
-  }
-
+  err := scanner.Err()
+  check(err)
 }
 
 func part2(scanner *bufio.Scanner) {
@@ -51,8 +55,6 @@ func part2(scanner *bufio.Scanner) {
 
   }
 
-  if err := scanner.Err(); err != nil {
-    log.Fatal(err)
-  }
-  
+  err := scanner.Err()
+  check(err)
 }
