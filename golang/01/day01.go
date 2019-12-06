@@ -4,8 +4,8 @@ import (
   "bufio"
   "fmt"
   "log"
-  "strconv"
   "os"
+  "strconv"
 )
 
 func main() {
@@ -20,16 +20,18 @@ func main() {
   }
   defer file.Close()
 
+  result := 0
   scanner := bufio.NewScanner(file)
   for scanner.Scan() {
-    // do stuff
-    var x int = strconv.Atoiscanner.Text()
-
-
-    fmt.Println(scanner.Text())
+    if i, err := strconv.Atoi(scanner.Text()); err == nil {
+      mass := (i / 3) - 2
+      result += mass
+    }
   }
 
   if err := scanner.Err(); err != nil {
       log.Fatal(err)
   }
+
+  fmt.Println(result)
 }
