@@ -44,7 +44,8 @@ func main() {
 	case "part1":
 		fmt.Println(part1(nums))
 	case "part2":
-		//part2(nums)
+		noun, verb := part2(nums)
+		fmt.Println(100 * noun + verb)
 	default:
 		fmt.Println("You must select 'part1' or 'part2'")
 		os.Exit(1)
@@ -52,8 +53,30 @@ func main() {
 }
 
 func part1(numbers []int) int {
+	return runLoop(12, 2, numbers)
+}
+
+func part2(numbers []int) (int, int) {
+	goal := 19690720
+
+	for i := 0; i < 100; i++ {
+		for j := 0; j < 100; j++ {
+			if runLoop(i, j, numbers) == goal {
+				fmt.Printf("noun is %v and verb is %v\n", i, j)
+				return i, j
+			}
+		}
+	}
+	// bogus error return val
+	return -1, -1
+}
+
+func runLoop(noun int, verb int, numbers []int) int {
 	var result = make([]int, len(numbers))
 	copy(result, numbers)
+
+	result[1] = noun
+	result[2] = verb
 
 	for i := 0; i < len(result); i += 4 {
 		switch result[i] {
@@ -67,13 +90,3 @@ func part1(numbers []int) int {
 	}
 	return result[0]
 }
-
-//func part2(numbers []int) {
-//	for scanner.Scan() {
-//		// get line of text with scanner.Text()
-//
-//	}
-//
-//	err := scanner.Err()
-//	check(err)
-//}
