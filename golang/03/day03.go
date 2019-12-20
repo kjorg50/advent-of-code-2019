@@ -4,10 +4,20 @@ import (
   "bufio"
   "fmt"
   "log"
+  "math"
   "os"
   "strconv"
   "strings"
 )
+
+var (
+  DX = map[string]int {"U": 0, "D": 0, "L": -1, "R": 1}
+  DY = map[string]int {"U": 1, "D": -1, "L": 0, "R": 0}
+)
+
+type Point struct{
+  x, y int64
+}
 
 func check(e error) {
   if e != nil {
@@ -34,56 +44,11 @@ func main() {
 
   file, err := os.Open(filename)
   check(err)
-
   defer file.Close()
+
   scanner := bufio.NewScanner(file)
-
-  switch part {
-  case "part1":
-    part1(scanner)
-  case "part2":
-    part2(scanner)
-  default:
-    fmt.Println("You must select 'part1' or 'part2'")
-    os.Exit(1)
-  }
-}
-
-type Point struct{
-  x, y int64
-}
-
-
-var (
-  DX = map[string]int {"U": 0, "D": 0, "L": -1, "R": 1}
-  DY = map[string]int {"U": 1, "D": -1, "L": 0, "R": 0}
-)
-
-func insertPoints(path string) map[Point]bool {
-  result := map[Point]bool {}
-  s := strings.Split(path, ",")
-  x, y := 0, 0
-  for _, cmd := range s {
-    // get the direction and the value of the command
-    dir := string(cmd[0])
-    rest := cmd[1:len(cmd)]
-    num, err := strconv.Atoi(rest)
-    check(err)
-
-    // add all the points on this line to the path
-    for i := 0; i < num; i++ {
-      x += DX[dir]
-      y += DY[dir]
-      result[Point{int64(x),int64(y)}] = true
-    }
-  }
-
-  return result
-}
-
-func part1(scanner *bufio.Scanner) {
-  var pathA = map[Point]bool {}
-  var pathB = map[Point]bool {}
+  var pathA = map[Point]int {}
+  var pathB = map[Point]int {}
   i := 0
 
   // read the data into the paths (hack the for loop for two lines)
@@ -97,7 +62,45 @@ func part1(scanner *bufio.Scanner) {
     i++
   }
 
-  // find the Manhattan distances of the points
+  switch part {
+  case "part1":
+    fmt.Println(part1(pathA, pathB))
+  case "part2":
+    fmt.Println(part2(pathA, pathB))
+  default:
+    fmt.Println("You must select 'part1' or 'part2'")
+    os.Exit(1)
+  }
+
+  scanErr := scanner.Err()
+  check(scanErr)
+}
+
+func insertPoints(path string) map[Point]int {
+  result := map[Point]int {}
+  s := strings.Split(path, ",")
+  x, y, length := 0, 0, 0
+  for _, cmd := range s {
+    // get the direction and the value of the command
+    dir := string(cmd[0])
+    rest := cmd[1:len(cmd)]
+    num, err := strconv.Atoi(rest)
+    check(err)
+
+    // add all the points on this line to the path
+    for i := 0; i < num; i++ {
+      x += DX[dir]
+      y += DY[dir]
+      length += 1
+      result[Point{int64(x),int64(y)}] = length
+    }
+  }
+
+  return result
+}
+
+func part1(pathA map[Point]int, pathB map[Point]int) int64 {
+  // find the Manhattan distances of the intersecting points
   var distances []int64
   for p := range pathA {
     _, ok := pathB[p]
@@ -113,19 +116,25 @@ func part1(scanner *bufio.Scanner) {
       min = v
     }
   }
-
-  err := scanner.Err()
-  check(err)
-
-  fmt.Println("Min is", min)
+  return min
 }
 
-func part2(scanner *bufio.Scanner) {
-  for scanner.Scan() {
-    // get line of text with scanner.Text()
-
+func part2(pathA map[Point]int, pathB map[Point]int) int {
+  // find the intersections
+  matches := map[Point]int {}
+  for p := range pathA {
+    _, ok := pathB[p]
+    if ok {
+      matches[p] = pathA[p] + pathB[p]
+    }
   }
 
-  err := scanner.Err()
-  check(err)
+  // find the min distances of the intersections
+  min := math.MaxInt32
+  for _, v := range matches {
+    if v < min {
+      min = v
+    }
+  }
+  return min
 }
